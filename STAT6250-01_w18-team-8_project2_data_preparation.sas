@@ -87,3 +87,155 @@ to just include data for 2016.
 [Unique ID Schema] The column Call Number is the unique id.
 ;
 
+*environmental setup;
+
+
+*setup environmental parameters;
+
+%let inputDataset1URL =
+https://github.com/stat6250/team-8_project2/blob/master/data/Fire_Calls_2016.xlsx?raw=true
+;
+%let inputDataset1Type = xlsx;
+%let inputDataset1DSN = Fire_Calls_2016_raw;
+
+%let inputDataset2URL =
+https://github.com/stat6250/team-8_project2/blob/master/data/Fire_Calls_2017.xlsx?raw=true
+;
+%let inputDataset2Type = xlsx;
+%let inputDataset2DSN = Fire_Calls_2017_raw;
+
+%let inputDataset3URL =
+https://github.com/stat6250/team-8_project2/blob/master/data/Fire_Incidents_2016.xlsx?raw=true
+;
+%let inputDataset3Type = xlsx;
+%let inputDataset3DSN = Fire_Incidents_2016_raw;
+
+%let inputDataset4URL =
+https://github.com/stat6250/team-8_project2/blob/master/data/Fire_Incidents_2017.xlsx?raw=true
+;
+%let inputDataset4Type = xlsx;
+%let inputDataset4DSN = Fire_Incidents_2017_raw;
+
+
+* load raw datasets over the wire;
+
+%macro loadDataIfNotAlreadyAvailable(dsn,url,filetype);
+    %put &=dsn;
+    %put &=url;
+    %put &=filetype;
+    %if
+        %sysfunc(exist(&dsn.)) = 0
+    %then
+        %do;
+            %put Loading dataset &dsn. over the wire now...;
+            filename tempfile "%sysfunc(getoption(work))/tempfile.xlsx";
+            proc http
+                method="get"
+                url="&url."
+                out=tempfile
+                ;
+            run;
+            proc import
+                file=tempfile
+                out=&dsn.
+                dbms=&filetype.;
+            run;
+            filename tempfile clear;
+        %end;
+    %else
+        %do;
+            %put Dataset &dsn. already exists. Please delete and try again.;
+        %end;
+%mend;
+%loadDataIfNotAlreadyAvailable(
+    &inputDataset1DSN.,
+    &inputDataset1URL.,
+    &inputDataset1Type.
+)
+%loadDataIfNotAlreadyAvailable(
+    &inputDataset2DSN.,
+    &inputDataset2URL.,
+    &inputDataset2Type.
+)
+%loadDataIfNotAlreadyAvailable(
+    &inputDataset3DSN.,
+    &inputDataset3URL.,
+    &inputDataset3Type.
+)
+%loadDataIfNotAlreadyAvailable(
+    &inputDataset4DSN.,
+    &inputDataset4URL.,
+    &inputDataset4Type.
+)
+
+* sort and check raw datasets for duplicates with respect to their unique ids,
+  removing blank rows;
+
+proc sort
+        nodupkey
+        data=Fire_Calls_2016_raw
+        dupout=Fire_Calls_2016_dups
+        out=Fire_Calls_2016_raw_sorted(where=(not(missing(Call_Number))))
+    ;
+    by
+        Call_Number
+    ;
+run;
+proc sort
+        nodupkey
+        data=Fire_Calls_2017_raw
+        dupout=Fire_Calls_2017_dups
+        out=Fire_Calls_2017_raw_sorted
+    ;
+    by
+        Call_Number
+    ;
+run;
+proc sort
+        nodupkey
+        data=Fire_Incidents_2016_raw
+        dupout=Fire_Incidents_2016_raw_dups
+        out=Fire_Incidents_2016_raw_sorted
+    ;
+    by
+        Call_Number
+    ;
+run;
+proc sort
+        nodupkey
+        data=Fire_Incidents_2017_raw
+        dupout=Fire_Incidents_2017_raw_dups
+        out=Fire_Incidents_2017_raw_sorted
+    ;
+    by
+        Call_Number
+    ;
+run;
+
+
+* build analytic dataset from raw datasets with the least number of columns and
+minimal cleaning/transformation needed to address research questions in
+corresponding data-analysis files;
+
+data SF_Fire_1617_analytic_file;
+    retain
+        Call_Number
+        Area_of_Fire_Orgin
+        Call_Type
+    ;
+    keep
+        Call_Number
+        Area_of_Fire_Orgin
+        Call_Type
+    ;
+    merge
+        Fire_Calls_2017_raw
+        Fire_Calls_2016_raw 
+        Fire_Incidents_2016_raw 
+	  	  Fire_Incidents_2017_raw 
+	;
+    by
+        Call_number
+    ;
+run;
+
