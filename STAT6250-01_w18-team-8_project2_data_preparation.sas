@@ -218,24 +218,72 @@ minimal cleaning/transformation needed to address research questions in
 corresponding data-analysis files;
 
 data SF_Fire_1617_analytic_file;
-    retain
+	retain
         Call_Number
-        Area_of_Fire_Orgin
         Call_Type
+		Area_of_Fire_Origin
+		Neighborhooods___Analysis_Bounda
+		Received_DtTm
+		Entry_DtTm
+		Dispatch_DtTm
+		Zipcode_of_Incident
     ;
     keep
         Call_Number
-        Area_of_Fire_Orgin
         Call_Type
+		Area_of_Fire_Origin
+		Neighborhooods___Analysis_Bounda
+		Received_DtTm
+		Entry_DtTm
+		Dispatch_DtTm
+		Zipcode_of_Incident
     ;
     merge
-        Fire_Calls_2017_raw
-        Fire_Calls_2016_raw 
-        Fire_Incidents_2016_raw 
-	  	  Fire_Incidents_2017_raw 
+        Fire_Calls_2017_raw_sorted
+        Fire_Calls_2016_raw_sorted
+        Fire_Incidents_2016_raw_sorted (rename=(number_of_alarms=number_of_alarms_char
+        supervisor_district=supervisor_district_char 
+	number_of_floors_with_extreme_da=floors_extreme_dam_char))
+	Fire_Incidents_2017_raw_sorted (rename=(number_of_alarms=number_of_alarms_char
+        supervisor_district=supervisor_district_char))
 	;
     by
-        Call_number
-    ;
+        Call_Number;
+	if
+        not(missing(compress(number_of_alarms_char,,'kd')))
+    then
+        do;
+            number_of_alarms = input(number_of_alarms_char,best12.);
+        end;
+    else
+        do;
+            call missing(number_of_alarms);
+        end;
+
+	if
+        not(missing(compress(supervisor_district_char,,'kd')))
+    then
+        do;
+            supervisor_district = input(supervisor_district_char,best12.);
+        end;
+    else
+        do;
+            call missing(supervisor_district);
+        end;
+
+
+	if
+        not(missing(compress(floors_extreme_dam_char,,'kd')))
+    then
+        do;
+            number_of_floors_with_extreme_da = 
+            input(floors_extreme_dam_char,best12.);
+        end;
+    else
+        do;
+            call missing(number_of_floors_with_extreme_da);
+        end;
 run;
+
+
 
