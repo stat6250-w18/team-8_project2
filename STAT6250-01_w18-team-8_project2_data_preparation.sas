@@ -232,7 +232,7 @@ data SF_Fire_1617_analytic_file;
         Fire_Calls_2017_raw
         Fire_Calls_2016_raw 
         Fire_Incidents_2016_raw 
-	  	  Fire_Incidents_2017_raw 
+        Fire_Incidents_2017_raw 
 	;
     by
         Call_number
