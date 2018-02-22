@@ -58,8 +58,8 @@ Fire Department has responded to in 2017.
 [Number of Features] 63
 
 [Data Source] https://data.sfgov.org/Public-Safety/Fire-Incidents/wr8u-xric
-The dataset was downloaded into an xlsx format and then filtered by Incident Date 
-to just include data for 2017.
+The dataset was downloaded into an xlsx format and then filtered by Incident 
+Date to just include data for 2017.
 
 [Data Dictionary] https://data.sfgov.org/api/views/wr8u-xric/files/54c601a2-63f1-4b27-a79d-f484c620f061?download=true&filename=FIR-0001_DataDictionary_fire-incidents.xlsx
 
@@ -79,8 +79,8 @@ Fire Department has responded to in 2016.
 [Number of Features] 63
 
 [Data Source] https://data.sfgov.org/Public-Safety/Fire-Incidents/wr8u-xric
-The dataset was downloaded into an xlsx format and then filtered by Incident Date 
-to just include data for 2016.
+The dataset was downloaded into an xlsx format and then filtered by Incident 
+Date to just include data for 2016.
 
 [Data Dictionary] https://data.sfgov.org/api/views/wr8u-xric/files/54c601a2-63f1-4b27-a79d-f484c620f061?download=true&filename=FIR-0001_DataDictionary_fire-incidents.xlsx
 
@@ -168,8 +168,8 @@ https://github.com/stat6250/team-8_project2/blob/master/data/Fire_Incidents_2017
     &inputDataset4Type.
 )
 
-* sort and check raw datasets for duplicates with respect to their unique ids,
-  removing blank rows;
+* sort and check raw datasets for duplicates with respect to their unique ids, 
+removing blank rows;
 
 proc sort
         nodupkey
@@ -181,6 +181,7 @@ proc sort
         Call_Number
     ;
 run;
+
 proc sort
         nodupkey
         data=Fire_Calls_2017_raw
@@ -191,6 +192,7 @@ proc sort
         Call_Number
     ;
 run;
+
 proc sort
         nodupkey
         data=Fire_Incidents_2016_raw
@@ -201,6 +203,7 @@ proc sort
         Call_Number
     ;
 run;
+
 proc sort
         nodupkey
         data=Fire_Incidents_2017_raw
@@ -212,78 +215,96 @@ proc sort
     ;
 run;
 
+*Character value conversion;
+
+data Fire_Incidents_2016_raw_sorted;
+    set Fire_Incidents_2016_raw_sorted
+    ;
+    num1 = input(number_of_floors_with_extreme_da,best12.)
+    ;
+    num2 = input(number_of_alarms,best12.)
+    ;
+    drop number_of_floors_with_extreme_da number_of_alarms
+    ;
+    rename num1 = number_of_floors_with_extreme_da
+    ;
+    rename num2 = number_of_alarms
+    ;
+run;
+
+data Fire_Incidents_2017_raw_sorted;
+    set Fire_Incidents_2017_raw_sorted
+    ;
+    num1 = input(number_of_floors_with_extreme_da,best12.)
+    ;
+    num2 = input(number_of_alarms,best12.)
+    ;
+    drop number_of_floors_with_extreme_da number_of_alarms
+    ;
+    rename num1 = number_of_floors_with_extreme_da
+    ;
+    rename num2 = number_of_alarms
+    ;
+    run;
+
+* combine Fire_Calls_2016 and Fire_Calls_2017 vertically;
+
+PROC SQL;
+CREATE TABLE Fire_Calls_1617 AS
+    SELECT * FROM Fire_Calls_2016_raw_sorted
+UNION CORRESPONDING ALL
+    SELECT * FROM Fire_Calls_2017_raw_sorted;
+QUIT;
+
+* combine Fire_Incidents_2016 and Fire_Incidents_2017 vertically;
+
+PROC SQL;
+CREATE TABLE Fire_Incidents_1617 AS
+    SELECT * FROM Fire_Incidents_2016_raw_sorted
+UNION CORRESPONDING ALL
+    SELECT * FROM Fire_Incidents_2017_raw_sorted;
+QUIT;
 
 * build analytic dataset from raw datasets with the least number of columns and
 minimal cleaning/transformation needed to address research questions in
 corresponding data-analysis files;
 
 data SF_Fire_1617_analytic_file;
-	retain
+    retain
         Call_Number
         Call_Type
-		Area_of_Fire_Origin
-		Neighborhooods___Analysis_Bounda
-		Received_DtTm
-		Entry_DtTm
-		Dispatch_DtTm
-		Zipcode_of_Incident
+        Area_of_Fire_Origin
+        Neighborhooods___Analysis_Bounda
+        Received_DtTm
+        Entry_DtTm
+        Dispatch_DtTm
+        Zipcode_of_Incident
     ;
     keep
         Call_Number
         Call_Type
-		Area_of_Fire_Origin
-		Neighborhooods___Analysis_Bounda
-		Received_DtTm
-		Entry_DtTm
-		Dispatch_DtTm
-		Zipcode_of_Incident
+        Area_of_Fire_Origin
+        Neighborhooods___Analysis_Bounda
+        Received_DtTm
+        Entry_DtTm
+        Dispatch_DtTm
+        Zipcode_of_Incident
     ;
     merge
-        Fire_Calls_2017_raw_sorted
-        Fire_Calls_2016_raw_sorted
-        Fire_Incidents_2016_raw_sorted (rename=(number_of_alarms=number_of_alarms_char
-        supervisor_district=supervisor_district_char 
-	number_of_floors_with_extreme_da=floors_extreme_dam_char))
-	Fire_Incidents_2017_raw_sorted (rename=(number_of_alarms=number_of_alarms_char
-        supervisor_district=supervisor_district_char))
-	;
+        Fire_Calls_1617(rename=(supervisor_district = supervisor_district_num))
+        Fire_Incidents_1617
+    ;
     by
-        Call_Number;
-	if
-        not(missing(compress(number_of_alarms_char,,'kd')))
-    then
-        do;
-            number_of_alarms = input(number_of_alarms_char,best12.);
-        end;
-    else
-        do;
-            call missing(number_of_alarms);
-        end;
-
-	if
-        not(missing(compress(supervisor_district_char,,'kd')))
-    then
-        do;
-            supervisor_district = input(supervisor_district_char,best12.);
-        end;
-    else
-        do;
-            call missing(supervisor_district);
-        end;
-
-
-	if
-        not(missing(compress(floors_extreme_dam_char,,'kd')))
-    then
-        do;
-            number_of_floors_with_extreme_da = 
-            input(floors_extreme_dam_char,best12.);
-        end;
-    else
-        do;
-            call missing(number_of_floors_with_extreme_da);
-        end;
+	Call_Number
+    ;
+    if
+        not(missing(compress(supervisor_district_num,'.','kd')))
+then
+    do;
+        supervisor_district = put(supervisor_district_num,4.);
+    end;
+else
+    do;
+        call missing(supervisor_district);
+    end;
 run;
-
-
-
