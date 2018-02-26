@@ -117,7 +117,7 @@ https://github.com/stat6250/team-8_project2/blob/master/data/Fire_Incidents_2017
 %let inputDataset4DSN = Fire_Incidents_2017_raw;
 
 
-* load raw datasets over the wire;
+* load raw datasets over the wire, if they doesn't already exist;
 
 %macro loadDataIfNotAlreadyAvailable(dsn,url,filetype);
     %put &=dsn;
@@ -169,7 +169,7 @@ https://github.com/stat6250/team-8_project2/blob/master/data/Fire_Incidents_2017
 )
 
 * sort and check raw datasets for duplicates with respect to their unique ids, 
-removing blank rows;
+removing blank rows, if needed;
 
 proc sort
         nodupkey
@@ -215,7 +215,8 @@ proc sort
     ;
 run;
 
-*Character value conversion;
+*Convert variable values of number_of_floors_with_extreme_da and number_of_alarms
+from numeric to character;
 
 data Fire_Incidents_2016_raw_sorted;
     set Fire_Incidents_2016_raw_sorted
@@ -247,23 +248,24 @@ data Fire_Incidents_2017_raw_sorted;
     ;
     run;
 
-* combine Fire_Calls_2016 and Fire_Calls_2017 vertically;
+* combine Fire_Calls_2016 and Fire_Calls_2017 vertically and combine 
+Fire_Incidents_2016 and Fire_Incidents_2017 vertically using proc sql which
+overlays the columns that have the same name in both datasets and does not 
+exclude duplicate rows;
 
-PROC SQL;
-CREATE TABLE Fire_Calls_1617 AS
-    SELECT * FROM Fire_Calls_2016_raw_sorted
-UNION CORRESPONDING ALL
-    SELECT * FROM Fire_Calls_2017_raw_sorted;
-QUIT;
+proc sql;
+create table Fire_Calls_1617 AS
+    select * FROM Fire_Calls_2016_raw_sorted
+union corresponding all
+    select * FROM Fire_Calls_2017_raw_sorted;
+quit;
 
-* combine Fire_Incidents_2016 and Fire_Incidents_2017 vertically;
-
-PROC SQL;
-CREATE TABLE Fire_Incidents_1617 AS
-    SELECT * FROM Fire_Incidents_2016_raw_sorted
-UNION CORRESPONDING ALL
-    SELECT * FROM Fire_Incidents_2017_raw_sorted;
-QUIT;
+proc sql;
+create table Fire_Incidents_1617 AS
+    select * FROM Fire_Incidents_2016_raw_sorted
+union corresponding all
+    select * FROM Fire_Incidents_2017_raw_sorted;
+quit;
 
 * build analytic dataset from raw datasets with the least number of columns and
 minimal cleaning/transformation needed to address research questions in
