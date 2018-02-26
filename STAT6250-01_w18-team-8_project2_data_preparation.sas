@@ -254,17 +254,17 @@ overlays the columns that have the same name in both datasets and does not
 exclude duplicate rows;
 
 proc sql;
-create table Fire_Calls_1617 AS
-    select * FROM Fire_Calls_2016_raw_sorted
-union corresponding all
-    select * FROM Fire_Calls_2017_raw_sorted;
+    create table Fire_Calls_1617 as
+        select * FROM Fire_Calls_2016_raw_sorted
+    union corresponding all
+        select * FROM Fire_Calls_2017_raw_sorted;
 quit;
 
 proc sql;
-create table Fire_Incidents_1617 AS
-    select * FROM Fire_Incidents_2016_raw_sorted
-union corresponding all
-    select * FROM Fire_Incidents_2017_raw_sorted;
+    create table Fire_Incidents_1617 as
+        select * FROM Fire_Incidents_2016_raw_sorted
+    union corresponding all
+        select * FROM Fire_Incidents_2017_raw_sorted;
 quit;
 
 * build analytic dataset from raw datasets with the least number of columns and
