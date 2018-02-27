@@ -263,7 +263,8 @@ proc sql;
         select 
 	    * 
 	from 
-	    Fire_Calls_2017_raw_sorted;
+	    Fire_Calls_2017_raw_sorted
+    ;
 quit;
 
 proc sql;
@@ -276,7 +277,8 @@ proc sql;
         select
 	    * 
 	from
-	    Fire_Incidents_2017_raw_sorted;
+	    Fire_Incidents_2017_raw_sorted
+    ;
 quit;
 
 * build analytic dataset from raw datasets with the least number of columns and
