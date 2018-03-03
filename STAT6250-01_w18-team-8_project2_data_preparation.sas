@@ -87,7 +87,40 @@ Date to just include data for 2016.
 [Unique ID Schema] The column Call Number is the unique id.
 ;
 
+
 *environmental setup;
+
+*create output formats;
+
+proc format;
+    value time_bins
+      low -< '01:00:00't = '12-1 AM'
+      '01:00:00't -< '02:00:00't = '1-2 AM'
+      '02:00:00't -< '03:00:00't = '2-3 AM'
+      '03:00:00't -< '04:00:00't = '3-4 AM'
+      '04:00:00't -< '05:00:00't = '4-5 AM'
+      '05:00:00't -< '06:00:00't = '5-6 AM'
+      '06:00:00't -< '07:00:00't = '6-7 AM'
+      '07:00:00't -< '08:00:00't = '7-8 AM'
+      '08:00:00't -< '09:00:00't = '8-9 AM'
+      '09:00:00't -< '10:00:00't = '9-10 AM'
+      '10:00:00't -< '11:00:00't = '10-11 AM'
+      '11:00:00't -< '12:00:00't = '11-12 AM'
+      '12:00:00't -< '13:00:00't = '12-1 PM'
+      '13:00:00't -< '14:00:00't = '1-2 PM'
+      '14:00:00't -< '15:00:00't = '2-3 PM'
+      '15:00:00't -< '16:00:00't = '3-4 PM'
+      '16:00:00't -< '17:00:00't = '4-5 PM'
+      '17:00:00't -< '18:00:00't = '5-6 PM'
+      '18:00:00't -< '19:00:00't = '6-7 PM'
+      '19:00:00't -< '20:00:00't = '7-8 PM'
+      '20:00:00't -< '21:00:00't = '8-9 PM'
+      '21:00:00't -< '22:00:00't = '9-10 PM'
+      '22:00:00't -< '23:00:00't = '10-11 PM'
+      '23:00:00't - high = '11-12 PM'
+      other = 'n/a'
+    ;
+run;
 
 
 *setup environmental parameters;
@@ -168,6 +201,7 @@ https://github.com/stat6250/team-8_project2/blob/master/data/Fire_Incidents_2017
     &inputDataset4Type.
 )
 
+
 * sort and check raw datasets for duplicates with respect to their unique ids, 
 removing blank rows, if needed;
 
@@ -215,6 +249,7 @@ proc sort
     ;
 run;
 
+
 *convert variable values of number_of_floors_with_extreme_da and number_of_alarms
 from numeric to character due variables being defined as more than one type.;
 
@@ -248,6 +283,7 @@ data Fire_Incidents_2017_raw_sorted;
     ;
     run;
 
+
 * combine Fire_Calls_2016 and Fire_Calls_2017 vertically and combine 
 Fire_Incidents_2016 and Fire_Incidents_2017 vertically using proc sql which
 overlays the columns that have the same name in both datasets and does not 
@@ -280,6 +316,7 @@ proc sql;
 	    Fire_Incidents_2017_raw_sorted
     ;
 quit;
+
 
 * combine Fire_Calls_1617 and Fire_Incidents_1617 horizontally, to build 
 analytic dataset from raw datasets with the least number of columns and minimal
@@ -324,4 +361,32 @@ else
     do;
         call missing(supervisor_district);
     end;
+run;
+
+
+*create temporary table contain the calls received time by substract time from
+datetime variable by using timepart function; 
+
+data calls_received_time;
+    set 
+        SF_Fire_1617_analytic_file
+    ;
+    received_time = timepart(Received_DtTm);
+    format received_time time_bins.;
+run;
+
+
+*create temporary table contain the time difference in seconds between the time
+of the received the call and the time of the first unit been dispatched;
+
+data response_time_diff (drop=received_date);
+    set 
+        SF_Fire_1617_analytic_file
+    ;
+    received_date = datepart(Received_DtTm)
+    ;
+    Fire_calls_year = year(received_date)
+    ;
+    timediff = intck('second',Received_DtTm,Dispatch_DtTm)
+    ;
 run;
