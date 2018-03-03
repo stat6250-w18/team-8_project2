@@ -215,7 +215,7 @@ proc sort
     ;
 run;
 
-*Convert variable values of number_of_floors_with_extreme_da and number_of_alarms
+*convert variable values of number_of_floors_with_extreme_da and number_of_alarms
 from numeric to character due variables being defined as more than one type.;
 
 data Fire_Incidents_2016_raw_sorted;
@@ -281,9 +281,10 @@ proc sql;
     ;
 quit;
 
-* build analytic dataset from raw datasets with the least number of columns and
-minimal cleaning/transformation needed to address research questions in
-corresponding data-analysis files;
+* combine Fire_Calls_1617 and Fire_Incidents_1617 horizontally, to build 
+analytic dataset from raw datasets with the least number of columns and minimal
+cleaning/transformation needed to address research questions in corresponding
+data-analysis files;
 
 data SF_Fire_1617_analytic_file;
     retain
