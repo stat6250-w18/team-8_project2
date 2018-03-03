@@ -9,7 +9,7 @@ questions regarding San Francisco Fire Department Calls and Incidents during
 2016 and 2017.
 
 Dataset Name: SF_Fire_1617_analytic_file created in external file
-STAT6250-02_w18-team-8_project2_data_preparation.sas, which is assumed to be
+STAT6250-01_w18-team-8_project2_data_preparation.sas, which is assumed to be
 in the same directory as this file
 
 See included file for dataset properties
@@ -22,7 +22,7 @@ X "cd ""%substr(%sysget(SAS_EXECFILEPATH),1,%eval(%length(%sysget(SAS_EXECFILEPA
 
 
 * load external file that generates analytic dataset SF_Fire_1617_analytic_file;
-%include '.\STAT6250-02_w18-team-8_project2_data_preparation.sas';
+%include '.\STAT6250-01_w18-team-8_project2_data_preparation.sas';
 
 
 *******************************************************************************;
