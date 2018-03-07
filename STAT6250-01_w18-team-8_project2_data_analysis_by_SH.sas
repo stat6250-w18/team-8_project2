@@ -76,28 +76,8 @@ illegal values, and better handle missing data.
 
 ;
 
-proc freq
-       data = SF_Fire_1617_analytic_file noprint
-   ;
-   table
-       Area_of_Fire_Origin / out = Count list
-   ;
-       where 
-           not(missing(Area_of_Fire_Origin));
-   ;
-run;
-
-proc sort
-       data = Count
-       out = Count_Desc
-   ;
-   by
-       descending count
-   ;
-run;
-
 proc print
-       data = Count_Desc (obs=5)
+       data = Count_Fire_Origin_Desc (obs=5)
    ;
 run;
 title;
@@ -116,6 +96,31 @@ title2
 'Rationale: This would determine what calls are more frequent which would allow dispatch to train their employees better in these call types.'
 ;
 
+*
+
+Note: This compares the column "Call Number" from Fire_Calls_2016
+to the column of the same name from Fire_Calls_2017 to combine the column
+"Call Type" from each year that has a unique call number.
+
+Methodology: Use PROC FREQ to generate a frequency table based on the dataset
+that counts the Call_Type. Then, use PROC SORT to temporarily sort the data by
+descending count, to find the most common call type. Use PROC PRINT 
+to print the most common call type. Conver the data to the percent format in 
+order to create a graph based on the frequency percentages. 
+
+Limitations: This methodology does not account for calls with missing data, 
+nor does it attempt to validate the data in any way.
+
+Followup Steps: More carefully clean values in order to filter out any possible 
+illegal values, and better handle missing data.
+
+;
+
+proc print
+        data = Count_Call_Type_Desc 
+   ;
+run;
+
 footnote1
 "The majority of call types the the San Francisco Fire Department received in 2016 and 2017 were medical incidents, which accounted for 76% of the calls."
 ;
@@ -129,50 +134,16 @@ footnote3
 ;
 
 footnote4
-"Therefore, the San Francisco Fire Department should of course be prepared for every call, but should be better preapred for medicial incident calls."
+"Therefore, the San Francisco Fire Department should of course be prepared for every call, but should be better prepared for medicial incident calls."
 ;
 
-*
-
-Note: This compares the column "Call Number" from Fire_Calls_2016
-to the column of the same name from Fire_Calls_2017 to combine the column
-"Call Type" from each year that has a unique call number.
-
-Methodology: Use PROC FREQ to generate a frequency table based on the dataset
-that counts the Call_Type. Then, use PROC SORT to temporarilysort the data by
-descending count, to find the most common call type. Finally, use PROC PRINT 
-to print the most common call type.
-
-Limitations: This methodology does not account for calls with missing data, 
-nor does it attempt to validate the data in any way.
-
-Followup Steps: More carefully clean values in order to filter out any possible 
-illegal values, and better handle missing data.
-
-;
-
-proc freq
-       data = SF_Fire_1617_analytic_file noprint
+proc sgplot
+        data = Count_Call_Type
+        
    ;
-   table
-       Call_Type / out = Count list
-   ; 
-       where 
-           not(missing(Call_Type));
+   hbar Call_Type / response=pct datalabel
    ;
-run;
-
-proc sort
-       data = Count
-       out = Count_Desc
-   ;
-   by
-       descending count
-   ;
-run;
-
-proc print
-        data = Count_Desc 
+   title 'Call Type Frequency'
    ;
 run;
 title;
@@ -228,27 +199,8 @@ illegal values, and better handle missing data.
 
 ;
 
-proc freq
-       data = SF_Fire_1617_analytic_file noprint
-   ;
-   table
-       Neighborhooods___Analysis_Bounda / out = Count list
-   ;
-    where 
-           not(missing(Neighborhooods___Analysis_Bounda));
-run;
-
-proc sort
-       data = Count
-       out = Count_Desc
-   ;
-   by
-       descending count
-   ;
-run;
-
 proc print
-        data = Count_Desc 
+        data = Count_Neighborhooods_Desc 
    ;
 run;
 title;
