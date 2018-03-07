@@ -30,7 +30,7 @@ X "cd ""%substr(%sysget(SAS_EXECFILEPATH),1,%eval(%length(%sysget(SAS_EXECFILEPA
 *******************************************************************************;
 
 title1
-'Research Question: When is the most frequent time called the fire department?'
+'Research Question: When is the most frequent time people called the fire department in 2016, and 2017?'
 ;
 
 title2
@@ -38,7 +38,11 @@ title2
 ;
 
 footnote1
-'The most frequent time people called the fire department was at 4-5 PM. 48.24% of the calls happened during 11 AM to 8 PM.'
+'The most frequent time people called the fire department in 2016 was at 5-6 PM, in 2017 was at 4-5pm.'
+;
+
+footnote2
+'Moreover, 53.08% of the calls happened from 10 am to 8 pm in 2016; 53.41% of the calls happend from 10 am to 8 pm in 2017'
 ;
 
 *
@@ -63,8 +67,11 @@ Followup Steps: More carefully clean values in order to filter out any possible
 illegal values, and better handle missing data.
 ;
 
-proc freq data = calls_received_time order=freq;
-    tables received_time;
+proc freq 
+		data = SF_Fire_1617_analytic_file_sort order=freq
+		;
+		by year;
+    	tables received_time;
 run;
 
 title;
@@ -84,7 +91,11 @@ title2
 ;
 
 footnote1
-'The top 5 zip codes had most fire incidents are 94103, 94102, 94109, 94110, and 94124. 48.59% of the fire incidents were happened in these areas.'
+'The top 5 zip codes had most fire incidents are 94103, 94102, 94109, 94110, and 94124 in 2016. 48.88% of the fire incidents were happened in these areas.'
+;
+
+footnote2
+'The top 5 zip codes had most fire incidents are 94103, 94102, 94109, 94110, and 94124 in 2017. 48.30% of the fire incidents were happened in these areas'
 ;
 
 *
@@ -106,8 +117,11 @@ Followup Steps: More carefully clean values in order to filter out any possible
 illegal values, and better handle missing data.
 ;
 
-proc freq data = SF_Fire_1617_analytic_file order=freq;
-    tables Zipcode_of_Incident;
+proc freq
+		data = SF_Fire_1617_analytic_file_sort order=freq
+		;
+		by year;
+    	tables Zipcode_of_Incident;
 run;
 
 title;
@@ -143,17 +157,21 @@ time of the calls received and the time of the first unit been dispatched in
 2016 and 2017.
 
 Limitations: There are missing and invalid datas (for example,there are negative
-time differences which are not making any sences). Caculate the mean in the year
-level is a not good choice to compare the response effiency, use the mean in the
-weekly, monthly, or quarterly level will be better. 
+time differences which are not making any sences, and there were some incidents
+took almost 9 hours till dipatched the first unit). Caculate the mean in the
+year level is a not good choice to compare the response effiency, use the mean
+in the daily, weekly, monthly, or quarterly level will be better. 
 
 Followup Steps: More carefully clean values in order to filter out any possible 
 illegal values, and better handle missing data. Caculate the time differences
-in defferent level (weekly, monthly, and quarterly).
+in defferent level (daily, weekly, monthly, and quarterly).
 ;
 
-proc means data = response_time_diff;
-    var timediff;
+proc means 
+		data = SF_Fire_1617_analytic_file_sort
+		;
+    	var timediff;
+		by year;
 run;
 
 title;
