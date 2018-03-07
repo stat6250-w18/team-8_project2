@@ -410,8 +410,93 @@ run;
 
 *use proc sort to create a temporary sorted table by year;
  proc sort 
-		data=SF_Fire_1617_analytic_file 
-		out=SF_Fire_1617_analytic_file_sort
-		;
-		by year;
+	data=SF_Fire_1617_analytic_file 
+	out=SF_Fire_1617_analytic_file_sort
+    ;
+	by 
+	    year
+    ;
+run;
+
+
+* use proc freq to create a frequency table and then use proc sort to create 
+a temporary sorted table in descending order by Count_Fire_Origin;
+
+proc freq
+       data = SF_Fire_1617_analytic_file noprint
+   ;
+   table
+       Area_of_Fire_Origin / out = Count_Fire_Origin list
+   ;
+       where 
+           not(missing(Area_of_Fire_Origin));
+   ;
+run;
+
+proc sort
+       data = Count_Fire_Origin
+       out = Count_Fire_Origin_Desc 
+   ;
+   by
+       descending count
+   ;
+run;
+
+
+* use proc freq to create a frequency table and then use proc sort to create 
+a temporary sorted table in descending order by Count_Call_Type;
+
+proc freq
+       data = SF_Fire_1617_analytic_file noprint
+   ;
+   table
+       Call_Type / out = Count_Call_Type list
+   ; 
+       where 
+           not(missing(Call_Type));
+   ;
+run;
+
+proc sort
+       data = Count_Call_Type
+       out = Count_Call_Type_Desc
+   ;
+   by
+       descending count
+   ;
+run;
+
+* apply the percent format to the Count_Call_Type
+data Count_Call_Type
+    ;
+    set Count_Call_Type
+    ;
+    label pct = 'Percent'
+    ;
+    format pct percent.
+    ;
+    pct = percent/100
+    ;
+run;
+  
+* use proc freq to create a frequency table and then use proc sort to create 
+a temporary sorted table in descending order by Count_Neighborhooods;
+
+proc freq
+       data = SF_Fire_1617_analytic_file noprint
+   ;
+   table
+       Neighborhooods___Analysis_Bounda / out = Count_Neighborhooods list
+   ;
+    where 
+           not(missing(Neighborhooods___Analysis_Bounda));
+run;
+
+proc sort
+       data = Count_Neighborhooods
+       out = Count_Neighborhooods_Desc
+   ;
+   by
+       descending count
+   ;
 run;
