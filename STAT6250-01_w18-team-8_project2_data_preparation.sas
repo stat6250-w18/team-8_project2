@@ -467,6 +467,7 @@ proc sort
 run;
 
 * apply the percent format to the Count_Call_Type
+
 data Count_Call_Type
     ;
     set Count_Call_Type
