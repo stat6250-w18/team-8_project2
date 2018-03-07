@@ -134,7 +134,7 @@ footnote3
 ;
 
 footnote4
-"Therefore, the San Francisco Fire Department should of course be prepared for every call, but should be better preapred for medicial incident calls."
+"Therefore, the San Francisco Fire Department should of course be prepared for every call, but should be better prepared for medicial incident calls."
 ;
 
 proc sgplot
