@@ -42,10 +42,20 @@ footnote1
 ;
 
 *
+Note: This compares the column "received_time" from Fire_Calls_2016_raw_sorted
+to the column of the sam name from Fire_Calls_2017_raw_sorted. 
 
-Methodology: Use PROC FREQ to get the list of the frequency of the calling 
-time, use order=freq option to list the frequency by descending order to know 
-the most frequent time people called the fire department. 
+Methodology: After sort the raw data files, create the new variable called 
+received_time by using timepart function to extract the time from the
+"Received_DtTm" variable, create the new variable named year by using datepart
+function to extract the date from the "Received_DtTm" variable, then use year
+function to extract the year for Fire_Calls of 2016 and 2017. Then after merged
+all the datasets to create the final analytical file
+"SF_Fire_1617_analytic_file" , use proc sort to create a temporary sorted table
+by received_time and year. Finally, use PROC FREQ here to get the list of the 
+frequency of the calling received_time, use order=freq option to list the 
+frequency by descending order to know the most frequent time people called the
+fire department in 2016 and 2017. 
 
 Limitations: Missing values in the dataset are not counted.
 
@@ -64,6 +74,7 @@ footnote;
 *******************************************************************************;
 * Research Question Analysis Starting Point;
 *******************************************************************************;
+
 title1
 'Research Question: List the top 5 zip codes had most fire incidents in 2016 and 2017?'
 ;
@@ -77,9 +88,16 @@ footnote1
 ;
 
 *
+Note: This compares the column "Zipcode_of_Incident" from
+Fire_Incidents_2016_raw_sorted to the column of the same name from
+Fire_Incidents_2017_raw_sorted.
 
-Methodology: Use PROC FREQ with order=freq option to list the frequency of the
-zip codes.
+Methodology: We have the new variable "year" created from the 
+Fire_Calls_2016_raw_sorted data file step, then after merged all the datasets to
+create the final analytical file "SF_Fire_1617_analytic_file" , use proc sort to
+create a temporary sorted table by year. Finally, use PROC FREQ here with 
+order=freq option to list the frequency of the zip codes where mostly had fire 
+incidents in 2016 and 2017.
 
 Limitations: This methodology does not account for calls with missing data, 
 nor does it attempt to validate the data in any way.
@@ -99,6 +117,7 @@ footnote;
 *******************************************************************************;
 * Research Question Analysis Starting Point;
 *******************************************************************************;
+
 title1
 'Research Question: How long in average it took from the time received by the dispatch center, to the time the first unit been dispatched in 2016 and 2017?'
 ;
@@ -112,15 +131,21 @@ footnote:
 ;
 
 *
+Note: This compares the column "Received_DtTm" from Fire_Calls_1617 to the
+column "Dispatch_DtTm" from Fire_Incidents_1617.
 
-Methodology: Use proc mean to caculate the average time difference between the
+Methodology: When create the final analytical file "SF_Fire_1617_analytic_file",
+create the new variable named "timediff" by using INTCK function to calculate 
+the time difference in seconds between variable "Dispatch_DtTm" and 
+"Received_DtTm". Then use proc sort to create a temporary sorted table by year.
+Finally, use proc mean here to caculate the average time difference between the
 time of the calls received and the time of the first unit been dispatched in
 2016 and 2017.
 
-Limitations: There are missing datas. There are negative time differences which
-are not making any sences. Caculate the mean in the year level is a not good
-choice to compare the response effiency, use the mean in the weekly, monthly,
-or quarterly level will be better. 
+Limitations: There are missing and invalid datas (for example,there are negative
+time differences which are not making any sences). Caculate the mean in the year
+level is a not good choice to compare the response effiency, use the mean in the
+weekly, monthly, or quarterly level will be better. 
 
 Followup Steps: More carefully clean values in order to filter out any possible 
 illegal values, and better handle missing data. Caculate the time differences

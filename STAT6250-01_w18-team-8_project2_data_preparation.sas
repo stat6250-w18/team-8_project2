@@ -371,7 +371,8 @@ data calls_received_time;
     set 
         SF_Fire_1617_analytic_file
     ;
-    received_time = timepart(Received_DtTm);
+    received_time = timepart(Received_DtTm)
+	;
     format received_time time_bins.;
 run;
 
