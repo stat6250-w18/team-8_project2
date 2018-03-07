@@ -120,6 +120,11 @@ proc print
         data = Count_Call_Type_Desc 
    ;
 run;
+title;
+
+
+title 'Call Type Frequency'
+;
 
 footnote1
 "The majority of call types the the San Francisco Fire Department received in 2016 and 2017 were medical incidents, which accounted for 76% of the calls."
@@ -141,8 +146,6 @@ proc sgplot
         data = Count_Call_Type 
    ;
    hbar Call_Type / response=pct datalabel
-   ;
-   title 'Call Type Frequency'
    ;
 run;
 title;
