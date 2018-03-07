@@ -138,8 +138,7 @@ footnote4
 ;
 
 proc sgplot
-        data = Count_Call_Type
-        
+        data = Count_Call_Type 
    ;
    hbar Call_Type / response=pct datalabel
    ;
