@@ -250,6 +250,34 @@ proc sort
 run;
 
 
+*create new variable named "received_time", and "year", apply user defined
+format to "received_time".;
+
+data Fire_Calls_2016_raw_sorted (drop=received_date);
+	set Fire_Calls_2016_raw_sorted
+	;
+	received_time = timepart(Received_DtTm)
+	;
+	received_date = datepart(Received_DtTm)
+	;
+	year = year(received_date)
+	;
+    format received_time time_bins.;
+run;
+
+data Fire_Calls_2017_raw_sorted (drop=received_date);
+	set Fire_Calls_2017_raw_sorted
+	;
+	received_time = timepart(Received_DtTm)
+	;
+	received_date = datepart(Received_DtTm)
+	;
+	year = year(received_date)
+	;
+    format received_time time_bins.;
+run;
+
+
 *convert variable values of number_of_floors_with_extreme_da and number_of_alarms
 from numeric to character due variables being defined as more than one type.;
 
@@ -281,7 +309,7 @@ data Fire_Incidents_2017_raw_sorted;
     ;
     rename num2 = number_of_alarms
     ;
-    run;
+run;
 
 
 * combine Fire_Calls_2016 and Fire_Calls_2017 vertically and combine 
@@ -318,10 +346,10 @@ proc sql;
 quit;
 
 
-* combine Fire_Calls_1617 and Fire_Incidents_1617 horizontally, to build 
-analytic dataset from raw datasets with the least number of columns and minimal
-cleaning/transformation needed to address research questions in corresponding
-data-analysis files;
+* combine Fire_Calls_1617 and Fire_Incidents_1617 horizontally, create new
+variable named "timediff", to build analytic dataset from raw datasets with the
+least number of columns and minimal cleaning/transformation needed to address
+research questions in corresponding data-analysis files;
 
 data SF_Fire_1617_analytic_file;
     retain
@@ -333,6 +361,9 @@ data SF_Fire_1617_analytic_file;
         Entry_DtTm
         Dispatch_DtTm
         Zipcode_of_Incident
+		received_time
+		year
+		timediff
     ;
     keep
         Call_Number
@@ -343,6 +374,9 @@ data SF_Fire_1617_analytic_file;
         Entry_DtTm
         Dispatch_DtTm
         Zipcode_of_Incident
+		received_time
+		year
+		timediff
     ;
     merge
         Fire_Calls_1617(rename=(supervisor_district = supervisor_district_num))
@@ -361,32 +395,15 @@ else
     do;
         call missing(supervisor_district);
     end;
+	timediff = intck('second',Received_DtTm,Dispatch_DtTm)
+    ;
 run;
 
 
-*create temporary table contain the calls received time by substract time from
-datetime variable by using timepart function; 
-
-data calls_received_time;
-    set 
-        SF_Fire_1617_analytic_file
-    ;
-    received_time = timepart(Received_DtTm);
-    format received_time time_bins.;
-run;
-
-
-*create temporary table contain the time difference in seconds between the time
-of the received the call and the time of the first unit been dispatched;
-
-data response_time_diff (drop=received_date);
-    set 
-        SF_Fire_1617_analytic_file
-    ;
-    received_date = datepart(Received_DtTm)
-    ;
-    Fire_calls_year = year(received_date)
-    ;
-    timediff = intck('second',Received_DtTm,Dispatch_DtTm)
-    ;
+*use proc sort to create a temporary sorted table by year;
+proc sort
+		data=SF_Fire_1617_analytic_file
+		out=SF_Fire_1617_analytic_file_sort
+	;
+	by year;
 run;
