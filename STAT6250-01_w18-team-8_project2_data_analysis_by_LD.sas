@@ -68,9 +68,9 @@ illegal values, and better handle missing data.
 ;
 
 proc freq 
-		data = SF_Fire_1617_analytic_file_sort order=freq
-		;
-		by year;
+	data = SF_Fire_1617_analytic_file_sort order=freq
+	;
+	by year;
     	tables received_time;
 run;
 
@@ -118,9 +118,9 @@ illegal values, and better handle missing data.
 ;
 
 proc freq
-		data = SF_Fire_1617_analytic_file_sort order=freq
-		;
-		by year;
+	data = SF_Fire_1617_analytic_file_sort order=freq
+	;
+	by year;
     	tables Zipcode_of_Incident;
 run;
 
@@ -168,10 +168,10 @@ in defferent level (daily, weekly, monthly, and quarterly).
 ;
 
 proc means 
-		data = SF_Fire_1617_analytic_file_sort
-		;
+	data = SF_Fire_1617_analytic_file_sort
+	;
     	var timediff;
-		by year;
+	by year;
 run;
 
 title;
