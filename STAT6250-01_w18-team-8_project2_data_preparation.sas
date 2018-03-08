@@ -369,9 +369,9 @@ data SF_Fire_1617_analytic_file;
         Entry_DtTm
         Dispatch_DtTm
         Zipcode_of_Incident
-	received_time
-	year
-	timediff
+        received_time
+        year
+        timediff
     ;
     keep
         Call_Number
@@ -382,9 +382,9 @@ data SF_Fire_1617_analytic_file;
         Entry_DtTm
         Dispatch_DtTm
         Zipcode_of_Incident
-	received_time
-	year
-	timediff
+        received_time
+        year
+        timediff
     ;
     merge
         Fire_Calls_1617(rename=(supervisor_district = supervisor_district_num))
@@ -409,12 +409,13 @@ run;
 
 
 *use proc sort to create a temporary sorted table by year;
- proc sort 
-	data=SF_Fire_1617_analytic_file 
-	out=SF_Fire_1617_analytic_file_sort
+
+proc sort 
+        data=SF_Fire_1617_analytic_file 
+        out=SF_Fire_1617_analytic_file_sort
     ;
-	by 
-	    year
+    by 
+	year
     ;
 run;
 
@@ -467,7 +468,7 @@ proc sort
 run;
 
 
-* apply the percent format to the Count_Call_Type
+* apply the percent format to the Count_Call_Type;
 
 data Count_Call_Type
     ;
