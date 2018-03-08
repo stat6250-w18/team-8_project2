@@ -369,9 +369,9 @@ data SF_Fire_1617_analytic_file;
         Entry_DtTm
         Dispatch_DtTm
         Zipcode_of_Incident
-		received_time
-		year
-		timediff
+	received_time
+	year
+	timediff
     ;
     keep
         Call_Number
@@ -382,9 +382,9 @@ data SF_Fire_1617_analytic_file;
         Entry_DtTm
         Dispatch_DtTm
         Zipcode_of_Incident
-		received_time
-		year
-		timediff
+	received_time
+	year
+	timediff
     ;
     merge
         Fire_Calls_1617(rename=(supervisor_district = supervisor_district_num))
@@ -466,6 +466,7 @@ proc sort
    ;
 run;
 
+
 * apply the percent format to the Count_Call_Type
 
 data Count_Call_Type
@@ -480,6 +481,7 @@ data Count_Call_Type
     ;
 run;
   
+  
 * use proc freq to create a frequency table and then use proc sort to create 
 a temporary sorted table in descending order by Count_Neighborhooods;
 
@@ -490,7 +492,7 @@ proc freq
        Neighborhooods___Analysis_Bounda / out = Count_Neighborhooods list
    ;
     where 
-           not(missing(Neighborhooods___Analysis_Bounda));
+       not(missing(Neighborhooods___Analysis_Bounda));
 run;
 
 proc sort
