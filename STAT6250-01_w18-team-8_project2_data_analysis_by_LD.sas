@@ -140,7 +140,7 @@ title2
 'Known the time spent for dispatch center to dispatch the first response unit after received the call, can help the dispatch center to improve response efficiency.'
 ;
 
-footnote:
+footnote
 'The average response time in 2016 was 163 second, in 2017 was 173 second.'
 ;
 
